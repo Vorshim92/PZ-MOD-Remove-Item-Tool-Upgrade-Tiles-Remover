@@ -1,0 +1,6 @@
+version=1
+id=3319434817
+title=Remove Item Tool Upgrade Tiles Remover
+description=This mod enhances the vanilla "Remove Item Tool" by expanding its functionality to allow the removal of tiles from selected areas. Whether you're looking to clear out debris, unwanted objects, or simply tidy up your environment, this tool provides a more comprehensive cleaning experience. With this improvement, you can easily manage and maintain your space with greater precision and efficiency. Perfect for those who appreciate a well-organized and clutter-free environment!
+tags=Build 41;Building;Interface;Multiplayer
+visibility=public
