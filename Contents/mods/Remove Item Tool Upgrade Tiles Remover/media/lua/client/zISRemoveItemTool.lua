@@ -1,14 +1,27 @@
+local coreFontSize = getCore():getOptionFontSize()
+
+local baseWidth = 340
+local baseHeight = 150
+
+-- Calcola nuovi valori per width e height in base al coreFontSize
+local widthMultiplier = 1 + (coreFontSize - 1) * 0.1 -- Aumenta la larghezza del 10% per ogni livello di font size
+local heightMultiplier = 1 + (coreFontSize - 1) * 0.2 -- Aumenta l'altezza del 20% per ogni livello di font size
+
+local adjustedWidth = baseWidth * widthMultiplier
+local adjustedHeight = baseHeight * heightMultiplier
+
 AdminContextMenu.onRemoveItemTool = function(playerObj)
-    local ui = ISRemoveItemTool:new(0, 0, 340, 150, playerObj);
+    local ui = ISRemoveItemTool:new(0, 0, adjustedWidth, adjustedHeight, playerObj);
     ui:initialise();
     ui:addToUIManager();
 end
 
 DebugContextMenu.onRemoveItemTool = function(playerObj)
-	local ui = ISRemoveItemTool:new(0, 0, 340, 150, playerObj);
-	ui:initialise();
-	ui:addToUIManager();
+    local ui = ISRemoveItemTool:new(0, 0, adjustedWidth, adjustedHeight, playerObj);
+    ui:initialise();
+    ui:addToUIManager();
 end
+
 
 
 local ISRemoveItemTool_initialise_ext = ISRemoveItemTool.initialise
