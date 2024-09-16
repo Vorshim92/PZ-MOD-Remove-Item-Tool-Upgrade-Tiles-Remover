@@ -3,9 +3,25 @@ local coreFontSize = getCore():getOptionFontSize()
 local baseWidth = 340
 local baseHeight = 150
 
--- Calcola nuovi valori per width e height in base al coreFontSize
-local widthMultiplier = 1 + (coreFontSize - 1) * 0.1 -- Aumenta la larghezza del 10% per ogni livello di font size
-local heightMultiplier = 1 + (coreFontSize - 1) * 0.2 -- Aumenta l'altezza del 20% per ogni livello di font size
+local widthMultiplier
+local heightMultiplier
+
+if coreFontSize == 1 then
+    widthMultiplier = 1
+    heightMultiplier = 1
+elseif coreFontSize == 2 then
+    widthMultiplier = 1.1 -- 10% più largo per 1x
+    heightMultiplier = 1.2 -- 20% più alto per 1x
+elseif coreFontSize == 3 then
+    widthMultiplier = 1.25 -- 25% più largo per 2x
+    heightMultiplier = 1.35 -- 35% più alto per 2x
+elseif coreFontSize == 4 then
+    widthMultiplier = 1.5 -- 50% più largo per 3x
+    heightMultiplier = 1.6 -- 60% più alto per 3x
+elseif coreFontSize == 5 then
+    widthMultiplier = 1.75 -- 75% più largo per 4x
+    heightMultiplier = 1.8 -- 80% più alto per 4x
+end
 
 local adjustedWidth = baseWidth * widthMultiplier
 local adjustedHeight = baseHeight * heightMultiplier
