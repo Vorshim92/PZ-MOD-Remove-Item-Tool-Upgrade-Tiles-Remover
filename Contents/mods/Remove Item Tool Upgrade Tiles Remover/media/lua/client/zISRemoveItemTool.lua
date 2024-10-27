@@ -41,29 +41,66 @@ end
 
 
 local ISRemoveItemTool_initialise_ext = ISRemoveItemTool.initialise
-
-
 function ISRemoveItemTool:initialise(...)
 print("ISRemoveItemTool:initialise()")
 ISRemoveItemTool_initialise_ext (self, ...)
+
     self.itemType:addOption("Tiles")
     -- self.floor = self.player:getZ()
-    self.entry = ISTextEntryBox:new(tostring(self.player:getZ()), 60, 80, 20, getTextManager():getFontHeight(UIFont.Small) + 3 * 2);
-    self.entry.font = UIFont.Small;
+    -- self.entry = ISTextEntryBox:new(tostring(self.player:getZ()), 60, 80, 20, getTextManager():getFontHeight(UIFont.Small) + 3 * 2);
+    self.entry = ISLabel:new(50, 70, 20, tostring(self.player:getZ()), 0.9, 0.75, 0, 1.0, UIFont.Small,true)-- _bLeft==nil and true or _bLeft);
+    -- self.entry:setOnlyNumbers(true);
+    -- self.entry:setName(tostring(self.player:getZ()));
+    self.entry.borderColor = {r=1.0, g=0.2, b=0.0, a=0.5};
     self.entry:initialise();
     self.entry:instantiate();
-    self.entry:setOnlyNumbers(true);
     self:addChild(self.entry);
+    self.entry.valueLabel = self.player:getZ()
+
+    self.button1p = ISButton:new(50+20+5,62, 16, 16, "", self, ISRemoveItemTool.onClickFloor);
+    self.button1p.internal = "B1PLUS";
+    self.button1p:initialise();
+    self.button1p:instantiate();
+    self.button1p.backgroundColor = {r=0, g=0, b=0, a=0.0};
+    self.button1p.textColor = {r=1.0, g=0.2, b=0.0, a=0.7}
+    self.button1p.backgroundColorMouseOver = {r=0.8, g=0.7, b = 0, a= 0.2 };
+	-- self.button1p.borderColor = {r=1.0, g=0.2, b=0.0, a=0.5};
+	self.button1p:setImage(getTexture("media/ui/upButton.png"))
+    self.button1p:forceImageSize(16, 16)
+    self:addChild(self.button1p);
+
+    self.button1m = ISButton:new(50+20+5,82, 16, 16, "", self, ISRemoveItemTool.onClickFloor);
+    self.button1m.internal = "B1MINUS";
+    self.button1m:initialise();
+    self.button1m:instantiate();
+    self.button1m.textColor = {r=1.0, g=0.2, b=0.0, a=0.7}
+    self.button1m.backgroundColor = {r=0, g=0, b=0, a=0.0};
+    self.button1m.backgroundColorMouseOver = {r=0.8, g=0.7, b = 0, a= 0.2 };
+	-- self.button1m.borderColor = {r=1.0, g=0.2, b=0.0, a=0.5};
+	self.button1m:setImage(getTexture("media/ui/downButton.png"))
+    self.button1m:forceImageSize(16, 16)
+    self:addChild(self.button1m);
+
 end
 
-function ISRemoveItemTool:onSelectedFloor()
--- Fake function
+function ISRemoveItemTool:onClickFloor(button)
+		local val = self.entry.valueLabel
+		local newEval = 0
+		if button.internal == "B1PLUS" then
+			newEval = val+1
+		elseif button.internal == "B1MINUS" then
+			newEval = val-1
+		end
+		if newEval < 0 then newEval = 0 end
+        if newEval > 8 then newEval = 8 end
+        self.entry.valueLabel = newEval
+		self.entry:setName(tostring(self.entry.valueLabel));
 end
 
 local ISRemoveItemTool_prerender_ext = ISRemoveItemTool.prerender
 function ISRemoveItemTool:prerender()
     ISRemoveItemTool_prerender_ext(self)
-    self:drawText("Z-axis", 55, 50, 1.0, 1.0, 1.0, 1.0, UIFont.Medium)
+    self:drawText("Z-axis", 45, 40, 1.0, 1.0, 1.0, 1.0, UIFont.Medium)
 end
 
 
@@ -84,7 +121,7 @@ function ISRemoveItemTool:onClick(button)
             local x2 = math.max(self.startPos.x, self.endPos.x)
             local y1 = math.min(self.startPos.y, self.endPos.y)
             local y2 = math.max(self.startPos.y, self.endPos.y)
-            local zPosText = self.entry:getText()
+            local zPosText = self.entry:getName()
             local zPos = tonumber(zPosText)  -- Converti il testo in numero
                 if not zPos then
                     print("Errore: il valore di zPos non è un numero valido.")
