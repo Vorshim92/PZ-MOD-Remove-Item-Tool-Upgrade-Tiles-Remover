@@ -42,16 +42,16 @@ end
 
 local ISRemoveItemTool_initialise_ext = ISRemoveItemTool.initialise
 function ISRemoveItemTool:initialise(...)
--- print("ISRemoveItemTool:initialise()")
+print("ISRemoveItemTool:initialise()")
 ISRemoveItemTool_initialise_ext (self, ...)
-
     self.itemType:addOption("Tiles")
     -- self.floor = self.player:getZ()
     -- self.entry = ISTextEntryBox:new(tostring(self.player:getZ()), 60, 80, 20, getTextManager():getFontHeight(UIFont.Small) + 3 * 2);
     self.entry = ISLabel:new(50, 70, 20, tostring(self.player:getZ()), 0.9, 0.75, 0, 1.0, UIFont.Small,true)-- _bLeft==nil and true or _bLeft);
     -- self.entry:setOnlyNumbers(true);
     -- self.entry:setName(tostring(self.player:getZ()));
-    self.entry.borderColor = {r=1.0, g=0.2, b=0.0, a=0.5};
+    -- self.entry.borderColor = {r=1.0, g=0.2, b=0.0, a=0.5};
+    -- self.entry.backgroundColor = {r=0, g=0, b=0, a=0.0};
     self.entry:initialise();
     self.entry:instantiate();
     self:addChild(self.entry);
@@ -100,13 +100,16 @@ end
 local ISRemoveItemTool_prerender_ext = ISRemoveItemTool.prerender
 function ISRemoveItemTool:prerender()
     ISRemoveItemTool_prerender_ext(self)
-    self:drawText("Z-axis", 45, 40, 1.0, 1.0, 1.0, 1.0, UIFont.Medium)
+    self:drawText("Z-Axis", 45, 35, 1.0, 0.2, 0.0, 0.7, UIFont.Medium)
+    self.entry:drawRectStatic(-1, 0, 16, 16, self.entry.backgroundColor.a, self.entry.backgroundColor.r, self.entry.backgroundColor.g, self.entry.backgroundColor.b);
+	self.entry:drawRectBorder(-1, 0, 16, 16, self.entry.borderColor.a, self.entry.borderColor.r, self.entry.borderColor.g, self.entry.borderColor.b);
+	-- self.entry:drawRectBorder(1, 1, 16-2, 16-2, self.entry.borderColor.a, self.entry.borderColor.r, self.entry.borderColor.g, self.entry.borderColor.b);
 end
 
 
 
 function ISRemoveItemTool:onClick(button)
-    -- print("ISRemoveItemTool:onClick()")
+    print("ISRemoveItemTool:onClick()")
 
     if button.internal == "SELECT" then
         self.selectEnd = false
@@ -124,7 +127,7 @@ function ISRemoveItemTool:onClick(button)
             local zPosText = self.entry:getName()
             local zPos = tonumber(zPosText)  -- Converti il testo in numero
                 if not zPos then
-                    -- print("Errore: il valore di zPos non è un numero valido.")
+                    print("Errore: il valore di zPos non è un numero valido.")
                     return
                 end
             local itemBuffer = {}
