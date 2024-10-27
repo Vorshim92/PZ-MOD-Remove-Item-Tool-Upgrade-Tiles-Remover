@@ -42,7 +42,7 @@ end
 
 local ISRemoveItemTool_initialise_ext = ISRemoveItemTool.initialise
 function ISRemoveItemTool:initialise(...)
-print("ISRemoveItemTool:initialise()")
+-- print("ISRemoveItemTool:initialise()")
 ISRemoveItemTool_initialise_ext (self, ...)
 
     self.itemType:addOption("Tiles")
@@ -106,7 +106,7 @@ end
 
 
 function ISRemoveItemTool:onClick(button)
-    print("ISRemoveItemTool:onClick()")
+    -- print("ISRemoveItemTool:onClick()")
 
     if button.internal == "SELECT" then
         self.selectEnd = false
@@ -124,7 +124,7 @@ function ISRemoveItemTool:onClick(button)
             local zPosText = self.entry:getName()
             local zPos = tonumber(zPosText)  -- Converti il testo in numero
                 if not zPos then
-                    print("Errore: il valore di zPos non è un numero valido.")
+                    -- print("Errore: il valore di zPos non è un numero valido.")
                     return
                 end
             local itemBuffer = {}
