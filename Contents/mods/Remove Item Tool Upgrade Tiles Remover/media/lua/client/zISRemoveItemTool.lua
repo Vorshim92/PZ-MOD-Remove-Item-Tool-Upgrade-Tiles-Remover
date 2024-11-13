@@ -45,13 +45,9 @@ function ISRemoveItemTool:initialise(...)
 print("ISRemoveItemTool:initialise()")
 ISRemoveItemTool_initialise_ext (self, ...)
     self.itemType:addOption("Tiles")
-    -- self.floor = self.player:getZ()
-    -- self.entry = ISTextEntryBox:new(tostring(self.player:getZ()), 60, 80, 20, getTextManager():getFontHeight(UIFont.Small) + 3 * 2);
+    self.itemType.autoWidth = false;
+    self.itemType:setWidthToFit()
     self.entry = ISLabel:new(50, 70, 20, tostring(self.player:getZ()), 0.9, 0.75, 0, 1.0, UIFont.Small,true)-- _bLeft==nil and true or _bLeft);
-    -- self.entry:setOnlyNumbers(true);
-    -- self.entry:setName(tostring(self.player:getZ()));
-    -- self.entry.borderColor = {r=1.0, g=0.2, b=0.0, a=0.5};
-    -- self.entry.backgroundColor = {r=0, g=0, b=0, a=0.0};
     self.entry:initialise();
     self.entry:instantiate();
     self:addChild(self.entry);
@@ -81,6 +77,17 @@ ISRemoveItemTool_initialise_ext (self, ...)
     self.button1m:forceImageSize(16, 16)
     self:addChild(self.button1m);
 
+    self.disableFloorCheck = ISTickBox:new(self.entry:getX()+160, self.entry:getY(), 15, 15, "remove-floor", self, nil)
+    self.disableFloorCheck.choicesColor = {r=1, g=1, b=1, a=1};
+    self.disableFloorCheck.borderColor = {r=1, g=1, b=1, a=0.5};
+    self.disableFloorCheck.backgroundColor = {r=0, g=0, b=0, a=0};
+    self.disableFloorCheck:initialise();
+    self.disableFloorCheck:instantiate()
+	self:addChild(self.disableFloorCheck)
+    self.disableFloorCheck:addOption("Remove Floor")
+    self.disableFloorCheck:setVisible(false)
+
+
 end
 
 function ISRemoveItemTool:onClickFloor(button)
@@ -104,8 +111,56 @@ function ISRemoveItemTool:prerender()
     self.entry:drawRectStatic(-1, 0, 16, 16, self.entry.backgroundColor.a, self.entry.backgroundColor.r, self.entry.backgroundColor.g, self.entry.backgroundColor.b);
 	self.entry:drawRectBorder(-1, 0, 16, 16, self.entry.borderColor.a, self.entry.borderColor.r, self.entry.borderColor.g, self.entry.borderColor.b);
 	-- self.entry:drawRectBorder(1, 1, 16-2, 16-2, self.entry.borderColor.a, self.entry.borderColor.r, self.entry.borderColor.g, self.entry.borderColor.b);
+    
 end
 
+local function vorshimHighlightObject(object)
+	if object
+	then
+		object:setHighlighted(true);
+        object:setHighlightColor(1, 0, 0, 1);
+	end
+end
+
+function ISRemoveItemTool:render()
+    if self.entry.valueLabel == 0 and self.itemType:isSelected(3) then
+        self.disableFloorCheck:setVisible(true)
+    else
+        self.disableFloorCheck:setVisible(false)
+    end
+    if self.selectStart then
+        local xx, yy = ISCoordConversion.ToWorld(getMouseXScaled(), getMouseYScaled(), self.zPos)
+        local sq = getCell():getGridSquare(math.floor(xx), math.floor(yy), self.zPos)
+        if sq and sq:getFloor() then vorshimHighlightObject(sq:getFloor()) end
+    elseif self.selectEnd then
+        local xx, yy = ISCoordConversion.ToWorld(getMouseXScaled(), getMouseYScaled(), self.zPos)
+        xx = math.floor(xx)
+        yy = math.floor(yy)
+        local cell = getCell()
+        local x1 = math.min(xx, self.startPos.x)
+        local x2 = math.max(xx, self.startPos.x)
+        local y1 = math.min(yy, self.startPos.y)
+        local y2 = math.max(yy, self.startPos.y)    
+        for x = x1, x2 do
+            for y = y1, y2 do
+                local sq = cell:getGridSquare(x, y, self.zPos)
+                if sq and sq:getFloor() then vorshimHighlightObject(sq:getFloor()) end
+            end
+        end
+    elseif self.startPos ~= nil and self.endPos ~= nil then
+        local cell = getCell()
+        local x1 = math.min(self.startPos.x, self.endPos.x)
+        local x2 = math.max(self.startPos.x, self.endPos.x)
+        local y1 = math.min(self.startPos.y, self.endPos.y)
+        local y2 = math.max(self.startPos.y, self.endPos.y)
+        for x = x1, x2 do
+            for y = y1, y2 do
+                local sq = cell:getGridSquare(x, y, self.zPos)
+                if sq and sq:getFloor() then vorshimHighlightObject(sq:getFloor()) end
+            end
+        end
+    end
+end
 
 
 function ISRemoveItemTool:onClick(button)
@@ -155,7 +210,9 @@ function ISRemoveItemTool:onClick(button)
                             for i=0, sq:getObjects():size()-1 do
                                 if instanceof(sq:getObjects():get(i), "IsoObject") then
                                     local item = sq:getObjects():get(i)
-                                    table.insert(itemBuffer, { it = item, square = sq })
+                                    if self.disableFloorCheck:isSelected(1) or (zPos ~= 0 or (zPos == 0 and not item:isFloor())) then
+                                        table.insert(itemBuffer, { it = item, square = sq })
+                                    end
                                 end
                             end
                         end
@@ -174,9 +231,9 @@ function ISRemoveItemTool:onClick(button)
                 elseif self.itemType:isSelected(2) then
                     sq:removeCorpse(item, false);
                 elseif self.itemType:isSelected(3) then
-                    local square = item:getSquare();
-                    triggerEvent("OnObjectAboutToBeRemoved", item);
-                    square:transmitRemoveItemFromSquare(item);
+                    -- triggerEvent("OnObjectAboutToBeRemoved", item);
+                    sq:transmitRemoveItemFromSquare(item);
+                    item:removeFromSquare();
                 end
             end
         end
@@ -186,3 +243,9 @@ function ISRemoveItemTool:onClick(button)
         return;
     end
 end
+
+-- thanks to bikini for the help
+-- z == 0 and not object:isFloor()
+
+-- square:transmitRemoveItemFromSquare(object);
+--             object:removeFromSquare();
